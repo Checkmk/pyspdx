@@ -1,9 +1,18 @@
 [tool.poetry]
 name = "pyspdx"
-version = "0.1.0"
+version = "1.0.0"
 description = "Validate SPDX expressions"
 authors = ["Tribe29 GmbH <info@tribe29.com>"]
 license = "GPL-2.0-only"
+readme = "README.md"
+repository = "https://github.com/tribe29/pyspdx"
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Typing :: Typed"
+]
+include = [
+    "COPYING"
+]
 
 [tool.poetry.dependencies]
 python = ">=3.7.2,<4.0"
@@ -30,3 +39,6 @@ disable = [
     "missing-function-docstring",
     "line-too-long",
 ]
+
+[build-system]
+requires = ["poetry"]
