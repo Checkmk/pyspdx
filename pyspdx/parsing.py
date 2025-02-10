@@ -22,4 +22,6 @@ LICENSE_EXPRESSION = pp.infix_notation(
         ("AND", 2, pp.opAssoc.LEFT),
         ("OR", 2, pp.opAssoc.LEFT),
     ],
+    lpar=pp.Literal("("),
+    rpar=pp.Literal(")"),
 )

@@ -87,45 +87,108 @@ def test_simple_expression(expression: str, result: List[str]) -> None:
 @pytest.mark.parametrize(
     "expression,successful",
     [
-        ("MIT AND MIT", True),
-        ("MIT WITH 389-exception", True),
-        ("MIT OR MIT", True),
-        ("MIT OR MIT AND MIT", True),
-        ("MIT OR (MIT AND MIT)", True),
-        ("(MIT OR MIT) AND MIT", True),
-        ("(MIT OR MIT AND MIT", False),
-        ("MIT", True),
-        ("FOO", False),
-        ("DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2", True),
-        ("MIT+", True),
-        ("MIT +", False),
+        ("MIT AND MIT", ["MIT", "AND", "MIT"]),
+        ("MIT WITH 389-exception", ["MIT", "WITH", "389-exception"]),
+        ("MIT OR MIT", ["MIT", "OR", "MIT"]),
+        ("MIT OR MIT AND MIT", ["MIT", "OR", "MIT", "AND", "MIT"]),
+        ("MIT OR (MIT AND MIT)", ["MIT", "OR", "(", "MIT", "AND", "MIT", ")"]),
+        ("(MIT OR MIT) AND MIT", ["(", "MIT", "OR", "MIT", ")", "AND", "MIT"]),
+        ("(MIT OR MIT AND MIT", []),
+        ("MIT", ["MIT"]),
+        ("FOO", []),
+        (
+            "DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2",
+            ["DocumentRef-", "spdx-tool-1.2", ":", "LicenseRef-", "MIT-Style-2"],
+        ),
+        ("MIT+", ["MIT+"]),
+        ("MIT +", []),
         (
             "(DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2 OR MIT)",
-            True,
+            [
+                "(",
+                "DocumentRef-",
+                "spdx-tool-1.2",
+                ":",
+                "LicenseRef-",
+                "MIT-Style-2",
+                "OR",
+                "MIT",
+                ")",
+            ],
         ),
         (
             "(Apache-2.0 WITH 389-exception OR BSD-3-Clause)",
-            True,
+            ["(", "Apache-2.0", "WITH", "389-exception", "OR", "BSD-3-Clause", ")"],
         ),
         (
             "(BSD-3-Clause OR Apache-2.0 WITH 389-exception)",
-            True,
+            ["(", "BSD-3-Clause", "OR", "Apache-2.0", "WITH", "389-exception", ")"],
         ),
-        ("(MIT OR MIT) AND MIT OR MIT", True),
+        (
+            "(MIT OR MIT) AND MIT OR MIT",
+            ["(", "MIT", "OR", "MIT", ")", "AND", "MIT", "OR", "MIT"],
+        ),
         (
             "(DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2 OR MIT) AND (BSD-3-Clause OR Apache-2.0 WITH 389-exception)",
-            True,
+            [
+                "(",
+                "DocumentRef-",
+                "spdx-tool-1.2",
+                ":",
+                "LicenseRef-",
+                "MIT-Style-2",
+                "OR",
+                "MIT",
+                ")",
+                "AND",
+                "(",
+                "BSD-3-Clause",
+                "OR",
+                "Apache-2.0",
+                "WITH",
+                "389-exception",
+                ")",
+            ],
         ),
         (
             "(DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2 OR (Apache-2.0 AND PostgreSQL OR OpenSSL)) AND (BSD-3-Clause OR Apache-2.0 WITH 389-exception)",
-            True,
+            [
+                "(",
+                "DocumentRef-",
+                "spdx-tool-1.2",
+                ":",
+                "LicenseRef-",
+                "MIT-Style-2",
+                "OR",
+                "(",
+                "Apache-2.0",
+                "AND",
+                "PostgreSQL",
+                "OR",
+                "OpenSSL",
+                ")",
+                ")",
+                "AND",
+                "(",
+                "BSD-3-Clause",
+                "OR",
+                "Apache-2.0",
+                "WITH",
+                "389-exception",
+                ")",
+            ],
         ),
     ],
 )
-def test_compound_expression(expression: str, successful: bool) -> None:
+def test_compound_expression(expression: str, successful: list[str]) -> None:
     if successful:
         # No exception
-        LICENSE_EXPRESSION.parse_string(expression, parse_all=True)
+        assert (
+            LICENSE_EXPRESSION.parse_string(expression, parse_all=True).as_list(
+                flatten=True
+            )
+            == successful
+        )
         return
 
     with pytest.raises(ParseException):

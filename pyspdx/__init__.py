@@ -17,7 +17,13 @@ def validate(spdx_str: str) -> None:
     >>> validate("MIT WITH LLVM-exception AND APACHE-2.0")
     >>> validate("DocumentRef-spdx-tool-1.2:LicenseRef-MIT-Style-2")
     """
+    tokenize(spdx_str)
+
+
+def tokenize(spdx_str: str) -> list[str]:
     try:
-        LICENSE_EXPRESSION.parse_string(spdx_str, parse_all=True)
+        return LICENSE_EXPRESSION.parse_string(spdx_str, parse_all=True).as_list(
+            flatten=True
+        )
     except ParseException:
         raise ValueError(f"{spdx_str!r} is not a valid SPDX expression") from None
